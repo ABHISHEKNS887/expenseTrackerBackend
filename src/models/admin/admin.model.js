@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, {Schema} from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const adminSchema = new Schema({
-    emial: {
+    email: {
         type: String,
         required: true,
         lowercase: true,
@@ -20,7 +20,7 @@ const adminSchema = new Schema({
 }, {timestamps: true})
 
 adminSchema.pre("save", async function (next) {
-    if (!this.modified('password')) return next();
+    if (!this.isModified('password')) return next();
 
     this.password = await bcrypt.hash(this.password, 10)
     next();

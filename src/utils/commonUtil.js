@@ -1,4 +1,4 @@
-import { Admin } from "../models/admin/user.model.js";
+import { Admin } from "../models/admin/admin.model.js";
 import mongoose from "mongoose";
 import { ApiError } from "../utils/apiError.js";
 

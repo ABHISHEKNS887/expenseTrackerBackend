@@ -1,7 +1,7 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/apiError.js";
-import { ApiResponse } from "../utils/apiResponse.js";
-import { Admin } from "../models/admin/user.model.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { ApiError } from "../../utils/apiError.js";
+import { ApiResponse } from "../../utils/apiResponse.js";
+import { Admin } from "../../models/admin/admin.model.js";
 import { generateAccessAndRefreshToken, validateMandatoryParams } from "../../utils/commonutil.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -16,7 +16,7 @@ const registerAdmin = asyncHandler( async(req, res) => {
 
     validateMandatoryParams([email, password])
 
-    const existedAdmin = await Admin.find(email);
+    const existedAdmin = await Admin.findOne({email: email});
 
     if (existedAdmin) {
         throw new ApiError(401, "Email already registered");
@@ -42,13 +42,13 @@ const loginAdmin = asyncHandler( async(req, res) => {
 
     validateMandatoryParams([email, password]) 
 
-    const existedAdmin = await Admin.find(email);
+    const existedAdmin = await Admin.findOne({email: email});
 
     if (!existedAdmin) {
         throw new ApiError(404, "Admin does not exist");
     }
 
-    const isPasswordValid = existedAdmin.isPasswordCorrect(password);
+    const isPasswordValid = await existedAdmin.isPasswordCorrect(password);
 
     if(!isPasswordValid) {
         throw new ApiError(401, "Incorrect password")
@@ -71,7 +71,7 @@ const loginAdmin = asyncHandler( async(req, res) => {
 })
 
 const logoutAdmin = asyncHandler( async(req, res) => {
-    await Admin.findByIdAndUpdate(req.user._id, 
+    await Admin.findByIdAndUpdate(req.admin._id, 
         {
             $unset : {refreshToken: 1} // This will remove the filed from the document.
         },
