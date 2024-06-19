@@ -2,7 +2,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/apiError.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
 import { Admin } from "../../models/admin/admin.model.js";
-import { generateAccessAndRefreshToken, validateMandatoryParams } from "../../utils/commonutil.js";
+import { generateAccessAndRefreshToken, validateMandatoryParams } from "../../utils/commonUtil.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 

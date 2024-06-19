@@ -1,11 +1,15 @@
 import dotenv from "dotenv";
 import connectDB from "./db/index.db.js";
 import { app } from "./app.js";
-
+import  swaggerUI from 'swagger-ui-express';
+import {swaggerSpec} from './swagger.js'
 
 dotenv.config({
     path: "/env"
 })
+
+// Serve Swagger documentation
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 connectDB()
 .then( () => {
