@@ -19,9 +19,12 @@ const generateAccessAndRefreshToken = async (userId, Model) => {
 }
 
 const validateMandatoryParams = function (params) {
+    let empty_params = []
     for (const param in params) {
-        if (!param) throw new ApiError(404, `${param} not found`)
+        if (!params[param]) empty_params.push(param)
     }
+
+    if (empty_params.length > 0) throw new ApiError(404, `${empty_params.join(", ")} params not found`)
 }
 
 export { generateAccessAndRefreshToken, validateMandatoryParams }

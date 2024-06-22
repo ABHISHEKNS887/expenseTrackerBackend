@@ -3,8 +3,6 @@ import { ApiError } from "../../utils/apiError.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
 import { Admin } from "../../models/admin/admin.model.js";
 import { generateAccessAndRefreshToken, validateMandatoryParams } from "../../utils/commonUtil.js";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 
 const OPTIONS = {
     httpOnly: true,
@@ -14,7 +12,10 @@ const OPTIONS = {
 const registerAdmin = asyncHandler( async(req, res) => {
     const {email, password} = req.body;
 
-    validateMandatoryParams([email, password])
+    validateMandatoryParams({
+        email: email,
+        password: password
+    })
 
     const existedAdmin = await Admin.findOne({email: email});
 
@@ -40,7 +41,10 @@ const registerAdmin = asyncHandler( async(req, res) => {
 const loginAdmin = asyncHandler( async(req, res) => {
     const {email, password} = req.body;
 
-    validateMandatoryParams([email, password]) 
+    validateMandatoryParams({
+        email: email,
+        password: password
+    }) 
 
     const existedAdmin = await Admin.findOne({email: email});
 

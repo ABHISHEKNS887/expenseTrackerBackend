@@ -9,6 +9,6 @@ router.route('/register').post(registerAdmin);
 router.route('/login').post(loginAdmin);
 
 // Secure Routes
- router.route('/logout').post(verifyAdminJWT, logoutAdmin);
+router.route('/logout').post(verifyAdminJWT, logoutAdmin);
 
  export default router;

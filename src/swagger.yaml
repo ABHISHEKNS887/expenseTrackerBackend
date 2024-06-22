@@ -82,3 +82,27 @@ paths:
           description: Unauthorized
         '500':
           description: Internal server error
+
+  /logout:
+    post:
+      summary: Logout an admin
+      description: Logout an admin with email and password.
+      tags:
+        - Admin
+      responses:
+        '200':
+          description: Admin logged out in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Admin logged in successfully
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error

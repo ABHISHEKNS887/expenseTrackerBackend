@@ -9,7 +9,10 @@ const addAndUpdateType = asyncHandler( async(req, res) => {
     const { type, categories} = req.body;
     let createType;
 
-    validateMandatoryParams([type, categories])
+    validateMandatoryParams({
+        type: type,
+        categories: categories
+    })
 
     const getType = await Type.findOne({type})
 
