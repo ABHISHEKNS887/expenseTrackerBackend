@@ -18,7 +18,7 @@ const addAndUpdateType = asyncHandler( async(req, res) => {
             getType._id,
             {
                 $set: {
-                    categories: getType.categories + categories.split(',')
+                    categories: categories.split(',').map(category => category.trim())
                 }
             },
             {

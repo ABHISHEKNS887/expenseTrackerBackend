@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: Expense Tracker
+  version: 1.0.0
+  description: A project which tracks the expense
+servers:
+  - url: /api/v1/admin/
+    description: Local server
+paths:
+  /register:
+    post:
+      summary: Register a new admin
+      description: Register a new admin with the required details.
+      tags:
+        - Admin
+      requestBody:
+        description: Admin registration details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: admin
+                email:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Admin registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Admin registered successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /login:
+    post:
+      summary: Login an admin
+      description: Login an admin with email and password.
+      tags:
+        - Admin
+      requestBody:
+        description: Admin login details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: admin@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Admin logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Admin logged in successfully
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
