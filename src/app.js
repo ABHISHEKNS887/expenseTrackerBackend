@@ -6,8 +6,11 @@ import helmet from "helmet";
 const app = express();
 
 app.use(cors(
-    {origin: process.env.CROSS_ORIGIN,
-    credentials: true}
+    {
+        origin: process.env.CROSS_ORIGIN,
+        methods: 'GET,POST,PUT,DELETE,PATCH', // Allow these HTTP methods
+        allowedHeaders: 'Content-Type,Authorization', // Allow these headers
+    }
 ))
 
 // enabling the Helmet middleware
