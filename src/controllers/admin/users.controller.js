@@ -83,9 +83,11 @@ const updateUser = asyncHandler( async(req, res) => {
 
     const updateUser = await User.findByIdAndUpdate(existedUser?._id,
         {
-            empId: empIdUpdate,
-            userName: userName,
-            email: email
+            $set: {
+                empId: empIdUpdate,
+                userName: userName,
+                email: email
+            }
         },
         {
             new: true

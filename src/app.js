@@ -24,12 +24,12 @@ app.use(cookieParser());
 // -------------------------------- Admin Routes --------------------------------
 // import router
 import adminRouter from "./routes/admin/admin.router.js";
-import typeRouter from "./routes/admin/type.router.js";
+import expenseTypesRouter from "./routes/admin/expenseTypes.router.js";
 import userRouter from "./routes/admin/users.router.js";
 
 //router declarations
 app.use('/api/v1/admin/', adminRouter);
-app.use('/api/v1/admin/types/', typeRouter);
+app.use('/api/v1/admin/expenseTypes/', expenseTypesRouter);
 app.use('/api/v1/admin/users/', userRouter);
 
 // -------------------------------- Admin Routes --------------------------------
