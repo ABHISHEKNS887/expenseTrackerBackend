@@ -218,6 +218,104 @@ paths:
           description: Unauthorized
         '500':
           description: Internal server error
+
+  /users/updateUser:
+    patch:
+      summary: Update a user
+      description: Update the details of an existing user. Requires admin authentication.
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: empId
+          schema:
+            type: string
+            default: 1000
+          description: Employee Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                  example: Jane Doe
+                email:
+                  type: string
+                  example: janedoe@example.com
+      responses:
+        '200':
+          description: Successfully updated the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User updated successfully
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 60d0fe4f5311236168a109ca
+                      name:
+                        type: string
+                        example: Jane Doe
+                      email:
+                        type: string
+                        example: janedoe@example.com
+                      age:
+                        type: integer
+                        example: 30
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+  
+  /users/deleteUser:
+    delete:
+      summary: Delete a user
+      description: Delete an existing user by their ID. Requires admin authentication.
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: empId
+          schema:
+            type: string
+            default: 1000
+          description: Employee Id
+      responses:
+        '200':
+          description: Successfully deleted the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
 components:
   securitySchemes:
     bearerAuth:

@@ -37,7 +37,8 @@ const createType = asyncHandler( async(req, res) => {
 
 // The Api will update only description and limit.
 const updateExpenseType = asyncHandler(async(req, res) => {
-    const { category, description, limit} = req.body;
+    const {description, limit} = req.body;
+    const {category} = req.params;
 
     validateMandatoryParams({
         category: category,
@@ -68,7 +69,7 @@ const updateExpenseType = asyncHandler(async(req, res) => {
 })
 
 const deleteExpenseType = asyncHandler( async(req, res) => {
-    const {category} = req.body;
+    const {category} = req.params;
 
     validateMandatoryParams({
         category: category

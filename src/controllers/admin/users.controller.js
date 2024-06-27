@@ -64,27 +64,38 @@ const getUsers = asyncHandler( async(req, res) => {
         "Fetched users list successfully"))
 })
 
+
+const checkDataIfExists = async function (data) {
+    const existData = [];
+    for (const item in data) {
+        const existedNewEmp = await User.findOne({[item]: data[item]});
+        if (existedNewEmp) existData.push(item);
+    }
+
+    return existData
+}
+
 const updateUser = asyncHandler( async(req, res) => {
-    const {empIdUpdate, userName, email} = req.body;
-    const {empId} = req.query;
+    const {userName, email} = req.body;
+    const {empId} = req.params;
 
     validateMandatoryParams({
             empId: empId,
-            empIdUpdate: empIdUpdate,
             userName: userName,
             email: email
         })
 
-    const existedUser = await User.findOne({
-        $or: [{empId}]
-    })
+    const existedUser = await User.findOne({empId})
 
     if (!existedUser) throw new ApiError(401, 'User not exists')
+
+    const existedData = await checkDataIfExists({userName: userName, email: email})
+
+    if (existedData.length > 0) throw new ApiError(401, `'${existedData.join(", ")}' already exists`)
 
     const updateUser = await User.findByIdAndUpdate(existedUser?._id,
         {
             $set: {
-                empId: empIdUpdate,
                 userName: userName,
                 email: email
             }
@@ -101,15 +112,13 @@ const updateUser = asyncHandler( async(req, res) => {
 })
 
 const deleteUser = asyncHandler( async(req, res) => {
-    const {empId} = req.body;
+    const {empId} = req.params;
 
     validateMandatoryParams({
             empId: empId
         })
 
-    const existedUser = await User.findOne({
-        $or: [{empId}]
-    })
+    const existedUser = await User.findOne({empId})
 
     if (!existedUser) throw new ApiError(401, 'User not exists')
 

@@ -10,9 +10,9 @@ const router = Router();
 // secure routers
 router.route('/createExpenseType').post(verifyAdminJWT, createType);
 
-router.route('/updateExpenseType').patch(verifyAdminJWT, updateExpenseType);
+router.route('/updateExpenseType/:category').patch(verifyAdminJWT, updateExpenseType);
 
-router.route('/deleteExpenseType').delete(verifyAdminJWT, deleteExpenseType);
+router.route('/deleteExpenseType/:category').delete(verifyAdminJWT, deleteExpenseType);
 
 router.route('/allExpenseTypes').get(verifyAdminJWT, getallExpenseTypes);
 
