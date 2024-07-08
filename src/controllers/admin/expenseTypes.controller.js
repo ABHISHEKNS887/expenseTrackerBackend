@@ -48,7 +48,7 @@ const updateExpenseType = asyncHandler(async(req, res) => {
 
     const getType = await ExpenseTypes.findOne({category})
 
-    if (!getType) throw new ApiError(409, `${category} expense type already exists`)
+    if (!getType) throw new ApiError(404, `${category} expense type not exists`)
 
     const expenseType = await ExpenseTypes.findByIdAndUpdate(getType._id, 
         {
