@@ -2,7 +2,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/apiError.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
 import { validateMandatoryParams } from "../../utils/commonUtil.js";
-import { User } from "../../models/admin/users.model.js";
+import { User } from "../../models/client/users.model.js";
 
 const createUser = asyncHandler( async(req, res) => {
     const {empId, userName, email} = req.body;

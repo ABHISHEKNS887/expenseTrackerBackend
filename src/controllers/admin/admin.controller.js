@@ -77,7 +77,7 @@ const loginAdmin = asyncHandler( async(req, res) => {
 const logoutAdmin = asyncHandler( async(req, res) => {
     await Admin.findByIdAndUpdate(req.admin._id, 
         {
-            $unset : {refreshToken: 1} // This will remove the filed from the document.
+            $unset : {refreshToken: 1} // This will remove the field from the document.
         },
         {
             new: true // This will return the data after update.
@@ -92,39 +92,39 @@ const logoutAdmin = asyncHandler( async(req, res) => {
 })
 
 const refreshAccessToken = asyncHandler( async(req, res) => {
-        const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
-        if (!incomingRefreshToken) {
-            throw new Error(401, "Unauthenticated Error")
+    if (!incomingRefreshToken) {
+        throw new Error(401, "Unauthenticated Error")
+    }
+
+    try {
+        const decodedToken =  jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+        const admin = await Admin.findById(decodedToken?._id)
+
+        if (!admin){
+            throw new ApiError(401, "Invalid Refresh Token")
         }
 
-        try {
-            const decodedToken =  jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
-    
-            const admin = await Admin.findById(decodedToken?._id)
-    
-            if (!admin){
-                throw new ApiError(401, "Invalid Refresh Token")
-            }
-    
-            if (incomingRefreshToken !== admin.refreshToken){
-                throw new ApiError(401, "Refresh Token is expired or used")
-            }
-    
-            const { accessToken, refreshToken } = await generateAccessAndRefreshToken(admin._id, Admin);
-    
-            return res
-            .status(200)
-            .cookie("accessToken", accessToken, OPTIONS)
-            .cookie("refreshToken", refreshToken, OPTIONS)
-            .json( new ApiResponse(
-                200,
-                {accessToken: accessToken, refreshToken: refreshToken},
-                "Access Token Refreshed"
-            ))
-        } catch (error) {
-            throw new ApiError(401, error?.message || "Invalid Refresh Token")
+        if (incomingRefreshToken !== admin.refreshToken){
+            throw new ApiError(401, "Refresh Token is expired or used")
         }
+
+        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(admin._id, Admin);
+
+        return res
+        .status(200)
+        .cookie("accessToken", accessToken, OPTIONS)
+        .cookie("refreshToken", refreshToken, OPTIONS)
+        .json( new ApiResponse(
+            200,
+            {accessToken: accessToken, refreshToken: refreshToken},
+            "Access Token Refreshed"
+        ))
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Invalid Refresh Token")
+    }
 })
 
 export {registerAdmin, loginAdmin, logoutAdmin, refreshAccessToken}
