@@ -33,4 +33,13 @@ app.use('/api/v1/admin/expenseTypes/', expenseTypesRouter);
 app.use('/api/v1/admin/users/', userRouter);
 
 // -------------------------------- Admin Routes --------------------------------
+
+// -------------------------------- Client Routes --------------------------------
+// import router
+import clientRouter from "./routes/client/users.router.js";
+
+//router declarations
+app.use('/api/v1/client/', clientRouter);
+
+// -------------------------------- Client Routes --------------------------------
 export { app }

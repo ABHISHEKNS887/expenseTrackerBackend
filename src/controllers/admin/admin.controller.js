@@ -3,11 +3,7 @@ import { ApiError } from "../../utils/apiError.js";
 import { ApiResponse } from "../../utils/apiResponse.js";
 import { Admin } from "../../models/admin/admin.model.js";
 import { generateAccessAndRefreshToken, validateMandatoryParams } from "../../utils/commonUtil.js";
-
-const OPTIONS = {
-    httpOnly: true,
-    secure: true
-}
+import { OPTIONS } from "../../constants.js";
 
 const registerAdmin = asyncHandler( async(req, res) => {
     const {email, password} = req.body;
