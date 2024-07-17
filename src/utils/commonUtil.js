@@ -27,4 +27,8 @@ const validateMandatoryParams = function (params) {
     if (empty_params.length > 0) throw new ApiError(404, `${empty_params.join(", ")} params not found`)
 }
 
-export { generateAccessAndRefreshToken, validateMandatoryParams }
+const isValidObjectId = function(id) {
+  return mongoose.Types.ObjectId.isValid(id);
+}
+
+export { generateAccessAndRefreshToken, validateMandatoryParams, isValidObjectId }

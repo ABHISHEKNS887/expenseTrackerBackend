@@ -6,29 +6,29 @@ import { validateMandatoryParams } from "../../utils/commonUtil.js";
 
 // This API handles creating the expense type.
 const createType = asyncHandler( async(req, res) => {
-    const { category, description, limit} = req.body;
+    const { expenseType, description, limit} = req.body;
 
     validateMandatoryParams({
-        category: category,
+        expenseType: expenseType,
         description: description,
         limit: limit
     })
 
-    const getType = await ExpenseTypes.findOne({category})
+    const getType = await ExpenseTypes.findOne({expenseType})
 
-    if (getType) throw new ApiError(409, `${category} expense type already exists`)
+    if (getType) throw new ApiError(409, `${expenseType} expense type already exists`)
 
     const createExpenseType = await ExpenseTypes.create(
         {
-            category: category,
+            expenseType: expenseType,
             description: description,
             limit: limit
         }
     )
 
-    const expenseType = await ExpenseTypes.findById(createExpenseType._id)
+    const createdExpenseType = await ExpenseTypes.findById(createExpenseType._id)
 
-    if (!expenseType) throw new ApiError(500, 'Something went wrong while creating expense type')
+    if (!createdExpenseType) throw new ApiError(500, 'Something went wrong while creating expense type')
 
     res
     .status(200)
@@ -38,17 +38,17 @@ const createType = asyncHandler( async(req, res) => {
 // The Api will update only description and limit.
 const updateExpenseType = asyncHandler(async(req, res) => {
     const {description, limit} = req.body;
-    const {category} = req.params;
+    const {expenseTypeId} = req.params;
 
     validateMandatoryParams({
-        category: category,
+        expenseTypeId: expenseTypeId,
         description: description,
         limit: limit
     })
 
-    const getType = await ExpenseTypes.findOne({category})
+    const getType = await ExpenseTypes.findById(expenseTypeId)
 
-    if (!getType) throw new ApiError(404, `${category} expense type not exists`)
+    if (!getType) throw new ApiError(404, `${expenseTypeId} expense type not exists`)
 
     const expenseType = await ExpenseTypes.findByIdAndUpdate(getType._id, 
         {
@@ -64,26 +64,26 @@ const updateExpenseType = asyncHandler(async(req, res) => {
 
     res
     .status(200)
-    .json(new ApiResponse(200, expenseType, `Expense Type '${category}' updated successfully`))
+    .json(new ApiResponse(200, expenseType, `Expense Type '${expenseType}' updated successfully`))
 
 })
 
 const deleteExpenseType = asyncHandler( async(req, res) => {
-    const {category} = req.params;
+    const {expenseTypeId} = req.params;
 
     validateMandatoryParams({
-        category: category
+        expenseTypeId: expenseTypeId
     })
 
-    const getType = await ExpenseTypes.findOne({category})
+    const getType = await ExpenseTypes.findById(expenseTypeId)
 
-    if (!getType) throw new ApiError(409, `${category} expense type already exists`)
+    if (!getType) throw new ApiError(409, `${expenseTypeId} expense type already exists`)
 
     await ExpenseTypes.findByIdAndDelete(getType._id)
 
     res
     .status(200)
-    .json(new ApiResponse(200,{}, `Expense Type '${category}' deleted successfully`))
+    .json(new ApiResponse(200,{}, 'Expense Type deleted successfully'))
 
 })
 

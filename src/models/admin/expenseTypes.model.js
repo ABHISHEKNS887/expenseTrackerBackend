@@ -1,7 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 
 const expenseTypesSchema = new Schema({
-    category: {
+    expenseType: {
         type: String,
         required: true,
         unique: true,

@@ -37,9 +37,11 @@ app.use('/api/v1/admin/users/', userRouter);
 // -------------------------------- Client Routes --------------------------------
 // import router
 import clientRouter from "./routes/client/users.router.js";
+import expenseRouter from "./routes/client/expenses.router.js";
 
 //router declarations
 app.use('/api/v1/client/', clientRouter);
+app.use('/api/v1/expense/', expenseRouter);
 
 // -------------------------------- Client Routes --------------------------------
 export { app }
