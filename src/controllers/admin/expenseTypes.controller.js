@@ -32,7 +32,7 @@ const createType = asyncHandler( async(req, res) => {
 
     res
     .status(200)
-    .json(new ApiResponse(200, expenseType, "Expense Type created successfully"))
+    .json(new ApiResponse(200, createdExpenseType, "Expense Type created successfully"))
 })
 
 // The Api will update only description and limit.
@@ -77,7 +77,7 @@ const deleteExpenseType = asyncHandler( async(req, res) => {
 
     const getType = await ExpenseTypes.findById(expenseTypeId)
 
-    if (!getType) throw new ApiError(409, `${expenseTypeId} expense type already exists`)
+    if (!getType) throw new ApiError(409, `Expense type does not exists`)
 
     await ExpenseTypes.findByIdAndDelete(getType._id)
 

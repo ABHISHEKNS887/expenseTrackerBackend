@@ -8,12 +8,13 @@ import { verifyAdminJWT } from "../../middlewares/auth.middleware.js";
 const router = Router();
 
 // secure routers
-router.route('/createExpenseType').post(verifyAdminJWT, createType);
+router.route('/')
+.post(verifyAdminJWT, createType)
+.get(verifyAdminJWT, getallExpenseTypes);
 
-router.route('/updateExpenseType/:category').patch(verifyAdminJWT, updateExpenseType);
+router.route('/:expenseTypeId')
+.patch(verifyAdminJWT, updateExpenseType)
+.delete(verifyAdminJWT, deleteExpenseType);
 
-router.route('/deleteExpenseType/:category').delete(verifyAdminJWT, deleteExpenseType);
-
-router.route('/allExpenseTypes').get(verifyAdminJWT, getallExpenseTypes);
 
 export default router;
