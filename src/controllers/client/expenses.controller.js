@@ -7,9 +7,9 @@ import { uploadOnCloudinary, deleteOnCloudinary } from "../../utils/cloudinary.j
 import { ExpenseTypes } from "../../models/admin/expenseTypes.model.js";
 
 const createExpense = asyncHandler( async(req, res) => {
-    const { expenseMonthYear, expenseTypeId, dateOfExpense, amount, remarks} = req.body;
+    const {expenseTypeId, dateOfExpense, amount, remarks} = req.body;
 
-    validateMandatoryParams({expenseMonthYear, expenseTypeId, dateOfExpense, amount})
+    validateMandatoryParams({expenseTypeId, dateOfExpense, amount})
 
     const isValidExpenseTypeId = isValidObjectId(expenseTypeId)
 
@@ -35,7 +35,6 @@ const createExpense = asyncHandler( async(req, res) => {
 
     const documentPaths = documentLocalPath.map(documentPath => documentPath.path)
 
-
     const cloudinaryDocuments = []
 
     for (let documentPath of documentPaths) {
@@ -44,7 +43,7 @@ const createExpense = asyncHandler( async(req, res) => {
     }
 
     const expense = await Expense.create({
-        expenseMonthYear: expenseMonthYear,
+        expenseMonthYear: getCurrentMonthYear(),
         empId: req.user?._id,
         expenseType: expenseTypeId,
         dateOfExpense: dateOfExpense,
@@ -64,4 +63,104 @@ const createExpense = asyncHandler( async(req, res) => {
     .json(new ApiResponse(200, createdExpense, "Expense created Successfully"))
 })
 
-export { createExpense }
+const getCurrentMonthYear = () => {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  
+  const now = new Date();
+  const month = months[now.getMonth()];
+  const year = now.getFullYear();
+  
+  return `${month}${year}`;
+};
+
+const updateExpense = asyncHandler( async(req, res) => {
+    const {expenseTypeId, dateOfExpense, amount, remarks} = req.body;
+    const {expenseId} = req.params;
+
+    const getExpense = await Expense.findById(expenseId);
+
+    if (!getExpense) {
+        throw new ApiError(404, `${expenseId} doesn't exist`)
+    }
+
+    if (expenseTypeId) {
+        if (!isValidObjectId(expenseTypeId)){
+            throw new ApiError(400, `Invalid expense type Id ${expenseTypeId}`)
+        }
+
+        if (!await ExpenseTypes.findById(expenseTypeId)){
+            throw new ApiError(404, 'Expense type not found')
+        }
+    }
+
+    if (amount) {
+        if (isNaN(amount)){
+            throw new ApiError(400, `Amount needs to be a number`)
+        }
+    }
+
+    const body = checkProperties({expenseTypeId, dateOfExpense, amount, remarks})
+
+    const documentLocalPath = req.files && Array.isArray(req.files.documents) && req.files.documents.length > 0 ? req.files.documents : null
+
+    if (documentLocalPath) {
+        // Delete existing document in the cloudinary
+        const files = getExpense.documents
+        for (const key in files) {
+            if (files.hasOwnProperty(key)) {
+                const url = files[key];
+                await deleteOnCloudinary(url, 'raw');
+                if (!deleteOnCloudinary){
+                    throw new ApiError(400, "Error while deleting file in cloudinary.")
+                }
+            }
+        }
+
+        // Add the new document to the cloudinary
+        const documentPaths = documentLocalPath.map(documentPath => documentPath.path)
+
+        const cloudinaryDocuments = []
+
+        for (let documentPath of documentPaths) {
+            const cloudinaryDocument = await uploadOnCloudinary(documentPath)
+            cloudinaryDocuments.push(cloudinaryDocument.url)
+        }
+
+        body.documents = cloudinaryDocuments
+    }
+
+    const expenseUpdate = await Expense.findByIdAndUpdate(expenseId,
+        {
+            $set: body
+        },
+        {
+            new: true
+        }
+    )
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, expenseUpdate, `Expense updated successfully. ID: ${expenseId}`))
+    
+})
+
+/**
+ * Checks which properties of an object are not null or undefined.
+ *
+ * @param {Object} obj - The object to check.
+ * @returns {Object} A new object containing only the properties that are not null or undefined.
+ */
+const checkProperties = (obj) => {
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== null && value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result;
+};
+
+export { createExpense , updateExpense}
