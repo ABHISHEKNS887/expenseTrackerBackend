@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createExpense, updateExpense } from "../../controllers/client/expenses.controller.js";
+import { createExpense, updateExpense, deleteExpense } from "../../controllers/client/expenses.controller.js";
 import { verifyUserJWT } from "../../middlewares/auth.middleware.js";
 import { upload } from "../../middlewares/multer.middleware.js";
 
@@ -12,11 +12,13 @@ router.route('/create').post(upload.fields([
             }
         ]), verifyUserJWT, createExpense);
 
-router.route('/:expenseId').patch(upload.fields([
+router.route('/:expenseId')
+.patch(upload.fields([
             {
                 name: "documents",
                 maxcount: 5
             }
         ]), verifyUserJWT, updateExpense)
+.delete(verifyUserJWT, deleteExpense)
 
 export default router;

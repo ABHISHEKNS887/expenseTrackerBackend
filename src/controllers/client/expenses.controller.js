@@ -109,15 +109,7 @@ const updateExpense = asyncHandler( async(req, res) => {
     if (documentLocalPath) {
         // Delete existing document in the cloudinary
         const files = getExpense.documents
-        for (const key in files) {
-            if (files.hasOwnProperty(key)) {
-                const url = files[key];
-                await deleteOnCloudinary(url, 'raw');
-                if (!deleteOnCloudinary){
-                    throw new ApiError(400, "Error while deleting file in cloudinary.")
-                }
-            }
-        }
+        await deleteFilesInCloudinary(files);
 
         // Add the new document to the cloudinary
         const documentPaths = documentLocalPath.map(documentPath => documentPath.path)
@@ -163,4 +155,50 @@ const checkProperties = (obj) => {
   return result;
 };
 
-export { createExpense , updateExpense}
+const deleteExpense = asyncHandler( async(req, res) => {
+    const {expenseId} = req.params;
+
+    validateMandatoryParams({expenseId});
+
+    const isValidExpenseId = isValidObjectId(expenseId)
+
+    if (!isValidExpenseId){
+        throw new ApiError(400, `Invalid Expense Id ${expenseId}`)
+    }
+    
+    const expense = await Expense.findById(expenseId)
+
+    if (!expense){
+        throw new ApiError(404, 'Expense not found')
+    }
+
+    // Delete existing document in the cloudinary
+    const files = expense.documents
+    await deleteFilesInCloudinary(files);
+    
+    try {
+        await Expense.findByIdAndDelete(expenseId)
+    } catch (error) {
+        throw new ApiError(500, 'Error While deleting the Expense')
+    }
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, {}, `Successfully deleted Expense Id: ${expenseId}`))
+})
+
+async function deleteFilesInCloudinary(files) {
+    for (const key in files) {
+        if (files.hasOwnProperty(key)) {
+            const url = files[key];
+            await deleteOnCloudinary(url, 'raw');
+            if (!deleteOnCloudinary) {
+                throw new ApiError(400, "Error while deleting file in cloudinary.");
+            }
+        }
+    }
+}
+
+export { createExpense , updateExpense, deleteExpense}
+
+

@@ -32,14 +32,18 @@ const deleteOnCloudinary = async (url, resourceType) => {
     const parts = url.split('/');
 
     // Get the second-to-last part which contains the ID
-    const idWithExtension = parts[parts.length - 1];
+    let idWithExtension = parts[parts.length - 1];
 
     // Remove the file extension '.jpg' to get the ID only
-    const id = idWithExtension.split('.')[0] + '.csv';
+    if (['image', 'video'].includes(resourceType)) {
+        idWithExtension = idWithExtension.split('.')[0];
+    }
 
     try {
-        if (!id) return null;
-        const response = await cloudinary.api.delete_resources([id], {"resource_type": resourceType});
+        if (!idWithExtension) return null;
+        const response = await cloudinary.api.delete_resources([idWithExtension], 
+            {"type": 'upload', "resource_type": resourceType});
+        console.log('Deleted the file in cloudinary: ' + idWithExtension)
         return response
     } catch (error) {
         console.log('Error while deleting the file from cloudinary: ' + JSON.stringify(error.error))
