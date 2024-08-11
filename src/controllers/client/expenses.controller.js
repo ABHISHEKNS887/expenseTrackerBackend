@@ -6,6 +6,7 @@ import { validateMandatoryParams, isValidObjectId } from "../../utils/commonUtil
 import { uploadOnCloudinary, deleteOnCloudinary } from "../../utils/cloudinary.js";
 import { ExpenseTypes } from "../../models/admin/expenseTypes.model.js";
 
+// --------------------------------- Create Expense API --------------------------------
 const createExpense = asyncHandler( async(req, res) => {
     const {expenseTypeId, dateOfExpense, amount, remarks} = req.body;
 
@@ -75,7 +76,9 @@ const getCurrentMonthYear = () => {
   
   return `${month}${year}`;
 };
+// --------------------------------- Create Expense API --------------------------------
 
+// --------------------------------- Update Expense API --------------------------------
 const updateExpense = asyncHandler( async(req, res) => {
     const {expenseTypeId, dateOfExpense, amount, remarks} = req.body;
     const {expenseId} = req.params;
@@ -154,7 +157,9 @@ const checkProperties = (obj) => {
   }
   return result;
 };
+// --------------------------------- Update Expense API --------------------------------
 
+// --------------------------------- Delete Expense API --------------------------------
 const deleteExpense = asyncHandler( async(req, res) => {
     const {expenseId} = req.params;
 
@@ -186,7 +191,76 @@ const deleteExpense = asyncHandler( async(req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, `Successfully deleted Expense Id: ${expenseId}`))
 })
+// --------------------------------- Delete Expense API --------------------------------
 
+// --------------------------------- Get Expense API --------------------------------
+const getExpense = asyncHandler( async(req, res) => {
+    const { query, sortBy = 'expenseMonthYear', sortType = 'asc' } = req.query
+
+    // Create filter based on query
+    const filter = {};
+    if (query) {
+        filter.expenseMonthYear = query; // Exact match on expenseMonthYear
+    } else {
+        throw new ApiError(404, "Query not found"); // Throw an error if query is not provided
+}
+
+    // Create sort object based on sortBy and sortType
+    const sort = {};
+    if (sortBy && sortType) {
+        sort[sortBy] = sortType === 'asc' ? 1 : -1;
+    }
+
+    const expenseData = await Expense.aggregate([
+        {
+            $match: {
+                empId: req.user._id,
+                ...filter, // Include the filter in the $match stage
+            },
+        },
+        {
+            $lookup: {
+                from: "expensetypes",
+                localField: "expenseType",
+                foreignField: "_id",
+                as: "expenseType",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 0,
+                            category: 1,
+                            description: 1,
+                            limit: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $unwind: {
+                path: "$expenseType",
+                preserveNullAndEmptyArrays: true, // Keep documents even if expenseType is not found
+            },
+        },
+        {
+            $sort: sort, // Apply sorting after filtering and lookup
+        },
+    ]);
+
+    // Add serial number to each document
+    const expenseDataWithSerialNumbers = expenseData.map((item, index) => ({
+        slNo: index + 1,
+        ...item,
+    }));
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, 
+        expenseDataWithSerialNumbers, 
+        expenseDataWithSerialNumbers.length > 0 ? "Fetched all expenses successfully": "No Data Found"))
+})
+
+// --------------------------------- Get Expense API --------------------------------
 async function deleteFilesInCloudinary(files) {
     for (const key in files) {
         if (files.hasOwnProperty(key)) {
@@ -199,6 +273,6 @@ async function deleteFilesInCloudinary(files) {
     }
 }
 
-export { createExpense , updateExpense, deleteExpense}
+export { createExpense , updateExpense, deleteExpense, getExpense}
 
 

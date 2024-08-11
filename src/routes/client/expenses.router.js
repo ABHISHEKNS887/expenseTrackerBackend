@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createExpense, updateExpense, deleteExpense } from "../../controllers/client/expenses.controller.js";
+import { createExpense, updateExpense, deleteExpense, getExpense } from "../../controllers/client/expenses.controller.js";
 import { verifyUserJWT } from "../../middlewares/auth.middleware.js";
 import { upload } from "../../middlewares/multer.middleware.js";
 
@@ -20,5 +20,7 @@ router.route('/:expenseId')
             }
         ]), verifyUserJWT, updateExpense)
 .delete(verifyUserJWT, deleteExpense)
+
+router.route('/').get(verifyUserJWT, getExpense)
 
 export default router;

@@ -37,10 +37,10 @@ const createType = asyncHandler( async(req, res) => {
 
 // The Api will update only description and limit.
 const updateExpenseType = asyncHandler(async(req, res) => {
-    const {description, limit} = req.body;
+    const {expenseType, description, limit} = req.body;
     const {expenseTypeId} = req.params;
 
-    validateMandatoryParams({
+    validateMandatoryParams({expenseType: expenseType,
         expenseTypeId: expenseTypeId,
         description: description,
         limit: limit
@@ -50,9 +50,10 @@ const updateExpenseType = asyncHandler(async(req, res) => {
 
     if (!getType) throw new ApiError(404, `${expenseTypeId} expense type not exists`)
 
-    const expenseType = await ExpenseTypes.findByIdAndUpdate(getType._id, 
+    const expenseTypeData = await ExpenseTypes.findByIdAndUpdate(getType._id, 
         {
             $set: {
+                expenseType: expenseType,
                 description: description,
                 limit: limit
             }
@@ -64,7 +65,7 @@ const updateExpenseType = asyncHandler(async(req, res) => {
 
     res
     .status(200)
-    .json(new ApiResponse(200, expenseType, `Expense Type '${expenseType}' updated successfully`))
+    .json(new ApiResponse(200, expenseTypeData, `Expense Type '${expenseType}' updated successfully`))
 
 })
 
