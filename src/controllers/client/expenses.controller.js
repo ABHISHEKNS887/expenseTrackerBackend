@@ -228,7 +228,7 @@ const getExpense = asyncHandler( async(req, res) => {
                     {
                         $project: {
                             _id: 0,
-                            category: 1,
+                            expenseType: 1,
                             description: 1,
                             limit: 1,
                         },
@@ -256,7 +256,9 @@ const getExpense = asyncHandler( async(req, res) => {
     res
     .status(200)
     .json(new ApiResponse(200, 
-        expenseDataWithSerialNumbers, 
+        {data: expenseDataWithSerialNumbers,
+        totalCount: expenseDataWithSerialNumbers.length
+        }, 
         expenseDataWithSerialNumbers.length > 0 ? "Fetched all expenses successfully": "No Data Found"))
 })
 
